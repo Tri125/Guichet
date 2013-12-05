@@ -1,0 +1,204 @@
+Maintenance Corrective:
+
+#1 Journal de la mise hors/sous tension
+
+    1) Modification de la classe Journal du package guichet.physique
+    
+    -Rajout d`une methode logStartUp pour imprimer un message de mise en
+    fonction dans le journal
+    
+    -Rajout d'une methode logShutdown pour imprimer un message de mise hors
+    fonction dans le journal
+    
+    
+    2) Modification de Guichet dans le package guichet
+    -Appel la fonction logStartUp() du journal dans la methode
+    performStartup()
+    -Appel la fonction logShutdown() du journal dans la methode
+    performShutdown()
+	
+
+#2 Expiration de sessions
+
+	1) Modification de Session dans le package guichet
+    
+    -Rajout de la classe TimerSessionExpire a l'interieur du code qui agit
+    comme timer pour le mecanisme d'expiration de session en cours.
+    
+    -Rajout d'un acessor de la classe TimerSessionExpire
+    
+    -Modification du switch dans la methode performSession. Dans le case
+    CHOOSING_TRANSACTION_STATE ajoute un systeme pour securise en cas
+    d'oublie de la carte durant une session
+    
+    
+    2) Modification de la classe Transaction du package guichet.transaction
+    
+    -Modification du switch de la methode performTransaction. Dans le case
+    ASKING_DO_ANOTHER_STATE et GETTING_SPECIFICS_STATE pour l'expiration de
+    sessions.
+	
+
+	
+Maintenance Adaptative:
+
+
+#3 Guichet distributeur de 5$
+
+	1) Rajout de la classe RetraitDenomination qui herite de Retrait dans le
+    package guichet.transaction:
+    
+    -Utilise un private final int nomme DENOMINATEUR pour specifier le
+    denominateur avec lequel l'on retire de l'argent
+    
+    -Redefinition de la methode getSpecificsFromCustomer de la classe parent
+    qui lit le multiple a partir
+    de la console du guichet en mode BILL (facture), cree un objet Argent
+    qui multiplie le denominateur par le multiple,
+    valide la transaction et la complete.
+    
+    
+    2) Modification de la classe Transaction dans le package
+    guichet.transaction:
+    
+    -Dans le switch contenue dans la methode makeTransaction, remplace le
+    contenue de la case 0 [Retrait] par un objet de type
+    RetraitDenomination
+    
+    
+    3) Modification de la classe Retrait:
+    
+    -Les attribues private from et amount sont maintenant protected
+	
+	4) Rajout de la classe Billets dans le package simulaion
+    
+    -Permet de concerver la quantite de billet de 20$ et de 5$
+    
+    -Lie la classe GUI et PanneausBillets pour deposer le montant initial
+    dans le guichet.
+    
+    
+    5) Modification de PanneauBillets dans le package simulation
+    
+    -Dans le constructeur rajout de labels pour inviter à rentrer un nombre
+    de billets de 5$
+    
+    -Dans le constructeur rajout d'un TextField pour ecrire le nombre de
+    billets de 5$
+    
+    -Modification de la classe readBills qui retourne maintenant un objet de
+    type Billets, rajout d'une variable temporaire pour enregistrer le
+    nombre de billets de 5$, verification de la validiter du nombre de
+    billets de 5$ et retourne un objet Billets avec le nombre de billets de
+    20$ et de 5$ comme parametre.
+    
+    -Rajout d'un TextField private Dollard_5_BillsNumberField
+    
+    
+    6) Modification de GUI dans le package simulation
+    
+    -Modification de la methode getInitialCash pour accomoder le nouveau
+    type de retour de PanneauBillets.readBills() [voir modification #2]
+    Enregistre temporairement le nombre de billets de 5 et de 20 et retourne
+    maintenant un objet Argent en prenant compte des billets de 5$.
+    
+    
+    7) Changement de commentaire dans OperatorPanel du package
+    guichet.physique
+    
+    -Reflette que la valeur retournee prend maintenant en compte les billets
+    de 5$
+	
+
+Maintenance perfective:
+
+
+#4 Journal lors de la conservation d'une carte
+
+    1) Modification de la classe Journal dans le package guichet.physique
+    
+    -Rajout de la methode logRetainCard() pour la conservation des cartes
+    
+    2) Modification de la classe Transaction dans le package
+    guichet.Transaction
+    
+    -Dans la methode performInvalidPINExtension, ajout de l'appel de la
+    methode logRetainCard du journal pour la retenue de carte.
+	
+	
+#5 Option de paiement de facture
+
+    1) Rajout de la classe Facture dans le package guichet.transaction qui
+    herite de Transaction:
+    
+    -getSpecificsFromCustomer:
+     lis le numero de la facture du clavier, le montant de la facture et le
+    numero de compte pour la transaction et retourne un message de type
+    FACTURE.
+    
+     -completeTransaction:
+      retourne un recu avec les informations
+    
+    2) Modification de la classe Transaction dans le package
+    guichet.transaction:
+    
+    -Dans l'array final de type String "TRANSACTION_TYPES_MENU" rajout d'un
+    menu appelee "Paiement facture"
+    
+    -Rajout d'un case dans le switch contenue a l'interieur de
+    "makeTransaction" qui retourne un objet de type "Facture".
+    
+    
+    3) Modification de la classe Message dans le package compte:
+    
+    -Rajout d'une variable int final "FACTURE"
+    
+    -Rajout d'un case "FACTURE" dans le switch contenue a l'interieur de la
+    methode toString()
+     qui affiche un message indiquant le paiement d'une facture.
+    
+    
+    4) Modification de la classe ConsoleClient dans le package
+    guichet.physique:
+    
+    -Rajout d'une methode "readBillNumber" qui lit le numero de la facture a
+    partir du clavier du guichet et le convertie en integer.
+    
+    
+    5) Modification de la classe Simulation dans le package simulation:
+    
+    -Rajout d'un static final int "BILL_MODE" pour definir un mode d'entree
+    en mode facture.
+    
+    
+    6) Modification de la classe SimClavier dans le package simulation:
+    
+    -Rajout d'un static final int "BILL_MODE" de la meme valeure que
+    Simulation.BILL_MODE [voir modification #5]
+    
+    -Rajout d'un case "BILL_MODE" dans le switch contenue dans la methode
+    clearKeyPressed() qui efface l'affichage
+    
+    -Rajout d'un case "BILL_MODE" dans le switch contenue dans la methode
+    enterKeyPressed() qui verifie que l'input
+     est plus grand que 0 et reveille le thread pour continuer
+    
+    -Rajout d'un case "BILL_MODE" dans le switch contenue dans la methode
+    digitKeyPressed qui rajoute le digit au currentInput et affiche le
+    currentInput a l'ecran
+	
+	-Dans le switch de la methode cancelKeyPressed rajout d'un case pour
+    BILL_MODE
+    
+    
+    7) Modification de la classe BanqueSimulee dans le package simulation:
+    
+    -Rajout d'un case "Message.FACTURE" [voir modification #3] dans le
+    switch contenue dans la methode handleMessage
+     qui retourne le resultat de la methode billPayment
+    
+    -Rajout de la methode billPayment qui retourne un objet de type Etat.
+    Verifie que le type de compte, que le compte client a suffisament de
+    fond
+     et le numero de la facture. Soustrait amount du compte client et
+    retourne les balances mise a jour.
